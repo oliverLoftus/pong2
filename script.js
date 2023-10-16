@@ -1,15 +1,3 @@
-// Get the canvas element and its 2D rendering context
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-// Get the centre of the canvas
-const centreX = canvas.width / 2;
-const centreY = canvas.height / 2;
-
-// Set scores
-let leftPlayerScore = 0;
-let rightPlayerScore = 0;
-
 // Define a class for managing velocity
 class Velocity {
     constructor(initialValue) {
@@ -34,15 +22,15 @@ class Velocity {
 
 // Define a class for game objects
 class GameObject {
-    constructor(rect, velocities) {
+    constructor(rect, velocity) {
         this.rect = rect;
-        this.velocities = velocities;
+        this.velocity = velocity;
     }
 
     // Method to update the position of the object
     updatePosition() {
-        this.rect.x += this.velocities.x.value;
-        this.rect.y += this.velocities.y.value;
+        this.rect.x += this.velocity.x.value;
+        this.rect.y += this.velocity.y.value;
     }
 
     // Method to draw the object on the canvas
@@ -57,20 +45,32 @@ class GameObject {
     }
 }
 
+// Get the canvas element and its 2D rendering context
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// Get the centre of the canvas
+const centreX = canvas.width / 2;
+const centreY = canvas.height / 2;
+
+// Set scores
+let leftPlayerScore = 0;
+let rightPlayerScore = 0;
+
 // Define the ball object
 const ballRect = { x: centreX, y: centreY, w: 10, h: 10 };
-const ballVelocities = { x: new Velocity(3), y: new Velocity(0) };
-const ball = new GameObject(ballRect, ballVelocities);
+const ballVelocity = { x: new Velocity(3), y: new Velocity(0) };
+const ball = new GameObject(ballRect, ballVelocity);
 
 // Define the left paddle
 const leftPaddleRect = { x: 10, y: centreY - 40, w: 10, h: 80 };
-const leftPaddleVelocities = { y: new Velocity(0) };
-const leftPaddle = new GameObject(leftPaddleRect, leftPaddleVelocities);
+const leftPaddleVelocity = { y: new Velocity(0) };
+const leftPaddle = new GameObject(leftPaddleRect, leftPaddleVelocity);
 
 // Define the right paddle
 const rightPaddleRect = { x: canvas.width - 20, y: centreY - 40, w: 10, h: 80 };
-const rightPaddleVelocities = { y: new Velocity(0) };
-const rightPaddle = new GameObject(rightPaddleRect, rightPaddleVelocities);
+const rightPaddleVelocity = { y: new Velocity(0) };
+const rightPaddle = new GameObject(rightPaddleRect, rightPaddleVelocity);
 
 // Function to check if two game objects intersect
 function intersect(object1, object2) {
@@ -86,8 +86,8 @@ function intersect(object1, object2) {
 }
 
 // Bounce randomness
-function randomizeBounce() {
-    // range -0.5 and 0.5
+function randomness() {
+    // Range -0.5 and 0.5
     return Math.random() - 0.5;
 }
 
@@ -114,21 +114,21 @@ function handleBallCollisions() {
 // Function to handle boundary collisions
 function handleBoundaryCollisions() {
     if (ball.getRect().y < 0 || ball.getRect().y + ball.getRect().h > canvas.height) {
-        ball.velocities.y.bounce();
-        ball.velocities.x.add(randomizeBounce());
+        ball.velocity.y.bounce();
+        ball.velocity.x.add(randomness());
     }
 }
 
 // Function to handle paddle collisions
 function handlePaddleCollisions() {
     if (intersect(ball, leftPaddle)) {
-        ball.velocities.x.bounce();
-        ball.velocities.y.add(randomizeBounce());
+        ball.velocity.x.bounce();
+        ball.velocity.y.add(randomness());
     }
 
     if (intersect(ball, rightPaddle)) {
-        ball.velocities.x.bounce();
-        ball.velocities.y.add(randomizeBounce());
+        ball.velocity.x.bounce();
+        ball.velocity.y.add(randomness());
     }
 }
 
@@ -136,13 +136,13 @@ function handlePaddleCollisions() {
 function checkScoring() {
     if (ball.getRect().x < 0) {
         resetBallPosition(3, -1); // Right player scores a point
-        ball.velocities.y.add(randomizeBounce());
+        ball.velocity.y.add(randomness());
         rightPlayerScore++;
     }
 
     if (ball.getRect().x + ball.getRect().w > canvas.width) {
         resetBallPosition(-3, 1); // Left player scores a point
-        ball.velocities.y.add(randomizeBounce());
+        ball.velocity.y.add(randomness());
         leftPlayerScore++;
     }
 }
@@ -151,8 +151,8 @@ function checkScoring() {
 function resetBallPosition(velX, velY) {
     ball.getRect().x = centreX;
     ball.getRect().y = centreY;
-    ball.velocities.x.set(velX);
-    ball.velocities.y.set(velY);
+    ball.velocity.x.set(velX);
+    ball.velocity.y.set(velY);
 }
 
 // Function to draw game elements on the canvas
