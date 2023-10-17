@@ -85,6 +85,12 @@ function intersect(object1, object2) {
     );
 }
 
+// Rect edge functions
+const topEdge = (object) => object.getRect().y;
+const bottomEdge = (object) => object.getRect().y + object.getRect().h;
+const leftEdge = (object) => object.getRect().x;
+const rightEdge = (object) => object.getRect().x + object.getRect().w;
+
 // Bounce randomness
 function randomness() {
     // Range -0.5 and 0.5
@@ -113,7 +119,7 @@ function handleBallCollisions() {
 
 // Function to handle boundary collisions
 function handleBoundaryCollisions() {
-    if (ball.getRect().y < 0 || ball.getRect().y + ball.getRect().h > canvas.height) {
+    if (topEdge(ball) < 0 || bottomEdge(ball) > canvas.height) {
         ball.velocity.y.bounce();
         ball.velocity.x.add(randomness());
     }
@@ -134,13 +140,13 @@ function handlePaddleCollisions() {
 
 // Function to check for scoring and reset the ball's position
 function checkScoring() {
-    if (ball.getRect().x < 0) {
+    if (leftEdge(ball) < 0) {
         resetBallPosition(3, -1); // Right player scores a point
         ball.velocity.y.add(randomness());
         rightPlayerScore++;
     }
 
-    if (ball.getRect().x + ball.getRect().w > canvas.width) {
+    if (rightEdge(ball) > canvas.width) {
         resetBallPosition(-3, 1); // Left player scores a point
         ball.velocity.y.add(randomness());
         leftPlayerScore++;
@@ -174,16 +180,16 @@ function drawGameElements() {
 
 // Event listeners to control the left paddle with arrow keys
 document.addEventListener("keydown", (event) => {
-    if (event.key === "w" && leftPaddle.rect.y > 0) {
+    if (event.key === "w" && topEdge(leftPaddle) > 0) {
         leftPaddle.rect.y -= 10;
-    } else if (event.key === "s" && leftPaddle.rect.y + leftPaddle.rect.h < canvas.height) {
+    } else if (event.key === "s" && bottomEdge(leftPaddle) < canvas.height) {
         leftPaddle.rect.y += 10;
     }
 
     // Right paddle controls
-    if (event.key === "ArrowUp" && rightPaddle.rect.y > 0) {
+    if (event.key === "ArrowUp" && topEdge(rightPaddle) > 0) {
         rightPaddle.rect.y -= 10;
-    } else if (event.key === "ArrowDown" && rightPaddle.rect.y + rightPaddle.rect.h < canvas.height) {
+    } else if (event.key === "ArrowDown" && bottomEdge(rightPaddle) < canvas.height) {
         rightPaddle.rect.y += 10;
     }
 });
